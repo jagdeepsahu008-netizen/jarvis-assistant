@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#000000">
+<meta name="description" content="JARVIS personal voice assistant">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<title>JARVIS — Personal Assistant</title>
+<style>
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%;background:#000;color:#b9dfff;font-family:Arial,sans-serif}
+body{min-height:100vh;overflow-x:hidden}
+main{width:min(100%,520px);min-height:100vh;margin:auto;padding:18px 20px 24px;display:flex;flex-direction:column;align-items:center;justify-content:space-between;background:#000}
+header{width:100%;display:flex;justify-content:space-between;align-items:center;font-size:11px;letter-spacing:3px;color:#28aaff;padding:8px 2px;border-bottom:1px solid #07335a}
+.status{color:#60caff}
+h1{font-size:34px;letter-spacing:9px;color:#219cff;text-shadow:0 0 16px #087cff;margin:26px 0 5px;text-align:center}
+.sub{font-size:10px;letter-spacing:5px;color:#62bfff;text-align:center}
+.visual{width:min(88vw,390px);aspect-ratio:1;position:relative;margin:24px auto 8px;display:grid;place-items:center}
+canvas{position:absolute;inset:0;width:100%;height:100%}
+.core{position:relative;width:37%;aspect-ratio:1;border:2px solid #259dff;border-radius:50%;display:grid;place-items:center;color:#38adff;font-weight:bold;letter-spacing:2px;background:radial-gradient(circle,#03101d 35%,#000 72%);box-shadow:0 0 16px #007bff, inset 0 0 20px #005eff88}
+.core:before,.core:after{content:"";position:absolute;inset:-9px;border:1px solid #147bdb;border-radius:50%;animation:pulse 2.5s ease-out infinite}
+.core:after{inset:-18px;animation-delay:1.25s}
+@keyframes pulse{0%{transform:scale(.85);opacity:.8}100%{transform:scale(1.18);opacity:0}}
+.greeting{min-height:30px;text-align:center;font-size:14px;color:#b5dcff;margin:10px 0 20px}
+.controls{width:100%;display:flex;flex-direction:column;gap:11px}
+button,input{font:inherit}
+button{border:1px solid #168ee9;background:#020b16;color:#65bdff;padding:15px 14px;border-radius:10px;box-shadow:0 0 12px #006dcb44;font-size:15px}
+button:active{background:#062344}
+#listen{background:linear-gradient(90deg,#031a2d,#062746);font-weight:bold}
+input{width:100%;padding:15px;border-radius:10px;border:1px solid #1267a9;background:#030a12;color:#d9f0ff;outline:none}
+#reply{text-align:center;min-height:34px;font-size:13px;line-height:1.5;color:#91c9ef;padding:8px}
+.apps{display:flex;justify-content:space-around;width:100%;margin:10px 0 4px}
+.apps a{color:#54b7ff;text-decoration:none;font-size:12px;text-align:center}
+.apps span{display:grid;place-items:center;width:48px;height:48px;border:1px solid #168ee9;border-radius:50%;font-size:20px;margin:0 auto 6px;box-shadow:0 0 10px #007bff44}
+footer{font-size:9px;letter-spacing:4px;color:#167bc1;text-align:center;padding-top:18px}
+</style>
+</head>
+<body>
+<main>
+<header><span>J.A.R.V.I.S.</span><span class="status" id="status">● ONLINE</span></header>
+<section style="width:100%;text-align:center">
+<h1>JARVIS</h1><div class="sub">PERSONAL AI INTERFACE</div>
+<div class="visual"><canvas id="sphere"></canvas><div class="core">READY</div></div>
+<div class="greeting" id="greeting">Hello Sir. JARVIS is ready.</div>
+<div id="reply">मैं आपकी बात सुनने के लिए तैयार हूँ।</div>
+</section>
+<section class="controls">
+<button id="listen">🎙 बोलें — “Jarvis, YouTube kholo”</button>
+<input id="command" placeholder="यहाँ अपना command लिखें…" autocomplete="off">
+<button id="send">COMMAND चलाएँ　➤</button>
+<div class="apps">
+<a href="https://www.youtube.com/" target="_blank" rel="noopener"><span>▶</span>YouTube</a>
+<a href="https://www.instagram.com/" target="_blank" rel="noopener"><span>◎</span>Instagram</a>
+<a href="https://web.whatsapp.com/" target="_blank" rel="noopener"><span>◉</span>WhatsApp</a>
+<a href="https://www.google.com/" target="_blank" rel="noopener"><span>G</span>Google</a>
+</div>
+</section>
+<footer>JARVIS SYSTEMS • ALL RIGHTS RESERVED</footer>
+</main>
+<script>
+// Animated 3D-style particle globe, inspired by the user's reference image.
+const canvas=document.getElementById('sphere'),ctx=canvas.getContext('2d');
+let w,h,points=[],angle=0;
+function resize(){const r=canvas.getBoundingClientRect(),d=window.devicePixelRatio||1;w=r.width;h=r.height;canvas.width=w*d;canvas.height=h*d;ctx.setTransform(d,0,0,d,0,0);makePoints()}
+function makePoints(){points=[];const n=950,g=Math.PI*(3-Math.sqrt(5));for(let i=0;i<n;i++){const y=1-(i/(n-1))*2,r=Math.sqrt(1-y*y),a=g*i;points.push({x:Math.cos(a)*r,y,z:Math.sin(a)*r})}}
+function draw(){ctx.clearRect(0,0,w,h);angle+=0.003;const radius=Math.min(w,h)*.46,focal=2.8;for(const p of points){const x=p.x*Math.cos(angle)-p.z*Math.sin(angle),z=p.x*Math.sin(angle)+p.z*Math.cos(angle),y=p.y;const scale=focal/(focal-z*.55),sx=w/2+x*radius*scale,sy=h/2+y*radius*scale;const depth=(z+1)/2,size=.7+depth*1.35,alpha=.2+depth*.8;ctx.beginPath();ctx.fillStyle=`rgba(${105+Math.round(depth*100)},${115+Math.round(depth*100)},255,${alpha})`;ctx.shadowBlur=depth*9+2;ctx.shadowColor='#4b59ff';ctx.arc(sx,sy,size,0,Math.PI*2);ctx.fill()}ctx.shadowBlur=0;requestAnimationFrame(draw)}
+if ('serviceWorker' in navigator && location.protocol.startsWith('http')) { navigator.serviceWorker.register('./sw.js').catch(()=>{}); }
+window.addEventListener('resize',resize);resize();draw();
+const reply=document.getElementById('reply'),status=document.getElementById('status');
+function speak(text){if('speechSynthesis' in window){speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(text);u.lang='en-IN';u.rate=.92;speechSynthesis.speak(u)}}
+function runCommand(raw){const s=raw.toLowerCase().replace(/[.,!?]/g,'');let url='';if(s.includes('youtube'))url='https://www.youtube.com/';else if(s.includes('whatsapp'))url='https://web.whatsapp.com/';else if(s.includes('instagram'))url='https://www.instagram.com/';else if(s.includes('google')||s.includes('browser')||s.includes('chrome'))url='https://www.google.com/';else if(s.includes('facebook'))url='https://www.facebook.com/';if(url){reply.textContent='Yes Sir. Opening '+raw; speak('Yes sir. Opening '+raw);window.open(url,'_blank','noopener')}else if(s.trim()){reply.textContent='Sir, this command is not set yet.';speak('Sorry sir. This command is not set yet.')}}
+document.getElementById('send').onclick=()=>{const v=document.getElementById('command').value.trim();if(v)runCommand(v)};
+document.getElementById('command').addEventListener('keydown',e=>{if(e.key==='Enter')document.getElementById('send').click()});
+document.getElementById('listen').onclick=()=>{const SR=window.SpeechRecognition||window.webkitSpeechRecognition;if(!SR){reply.textContent='Voice recognition is not available here. Please type a command.';return}const rec=new SR();rec.lang='hi-IN';rec.interimResults=false;rec.maxAlternatives=1;status.textContent='● LISTENING';reply.textContent='Listening, Sir…';rec.onresult=e=>runCommand(e.results[0][0].transcript);rec.onerror=()=>reply.textContent='Microphone issue. Please check permission.';rec.onend=()=>status.textContent='● ONLINE';rec.start()};
+document.getElementById('greeting').addEventListener('click',()=>speak('Hello sir. Jarvis is ready.'));
+</script>
+</body></html>
